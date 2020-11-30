@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox
+spec:
+  selector:
+    matchLabels:
+      app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      volumes:
+      - name: volume-test
+        emptyDir: {}
+      containers:
+      - name: app
+        image: hub-mirror.c.163.com/library/busybox
+        volumeMounts:
+        - name: volume-test
+          mountPath: /datatest
+          readOnly: true
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64M
+          requests:
+            cpu: 100m
+            memory: 64M
+        args:
+        - top
