@@ -1,0 +1,58 @@
+kind: GitRepo
+apiVersion: fleet.cattle.io/v1alpha1
+metadata:
+  name: simple
+  namespace: fleet-local
+spec:
+  repo: https://git.tdology.com/xiaohang/gittest/
+  clientSecretName: hang-ssh-auth
+  paths:
+  - simple
+
+
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: hang-ssh-auth
+  namespace: fleet-local
+type: kubernetes.io/ssh-auth
+data:
+  # the data is abbreviated in this example
+  ssh-privatekey: |
+     MIIEowIBAAKCAQEA03eii0Aqn2mhcpFMVh5Szx3yL+BYT6St5TwD1cGMNmaYh4GcD2gk6OPo0/JUZhGy6HyUOFVyW56O2n2Vak/tUjtz7BaLDzVRVQcObIAJye6732uJJwQQv6F/Kh8IdrUqgqFHLnCkvzR0RdFKSP/pR8Jgze04bKYGMyLhTFbGhqSYaEmyj6ZCFhxYeAC20im2Z/lphMp1k7Uto7/tGGWApb0qW5qi/ny7u4+7tnUEmQFYEnort9QGC42LyXp3ItXOEDSUVulaVodF6pDnzcZQtCmAA4lkC14yvDImcGalsbrmF0CxaWDiXAhWeUArccrYtAZ9TCRV1LBAxUuvdfh7NQIDAQABAoIBACEPhSQMJh3CH/GPccXM+9lRrzl485WQA3fhSCA1IDypEZOt2b424/5dE1t/eV5zyeq6/1lHUpesVF0oYSG72TiP/vGcHKWGCm8mqUShR+aAInMtlsW4xv2OvBjTvTkB3eGKYVyLU9Zo1vzLWbfL+qazZvsK6VVjJ3j7LQoITwVhkWs76nA3hXnwlRqK6mfVAqDJCkMm7EyP98elvYPyVrVxPRQjIzyDes/Mhaot8/1ZWGcv8DJKehZAsGCMfMAuoIIkQ2jU4TJB2CfYAluIq2OgRlpnoF99QyJ3oZyu5/fiEI+PNiQR9bI7mD6ZNeumPKBZnYiQRm8MTNB8qyakkCgYEA9l/KWzf+Fc2PngI4lDeMK62R8sQjhUeErgwXp8OW3xJtnxklFb2G11jFjzzUT7IHbNKMjQZrfYWZSEEO18AmwIrZwCRpThGnwNo5LqBK7ObUyzkhJ1koJykicQmFVxO+Vr8IP8t4gCUgepvUMpQ7zZclOhF9Pew+1Y5SbFVTHMCgYEA27q1quPgMqSk8CaHGX2Y1Uog1D4y65z8RTx5BPoQYFGzUo71fhI12M2Gm2m5tqr+Kzem653yGhoX5B24tkbFipWWTj2ZkXXs1zveT0KwIQ/qtFxymrEshwRyM5OVz+GcSwkpDZJMLTROX4dZ1A5hQsLQgs+wBlEL/Yl5wgu9l7cCgYBjUyjsb31i4tV0eSbAMkizTy1YttQvJi8KT9u1ibeoRPCmxdcBWufqp2I2JereGkK+D4AUVrM9DoBGTdwjBNdapl+1A7jkfV+o8xE8h+jM6x58s5J3H419hCrbcWAtQ8tng2pa9belydH3PB1nKrWVY8rhRy27qiOGyvLVs+xmwKBgQCHKoz0iedx39xiqqCy6pMoqcgWKAj07YY2JSQhDp8iUT/pim2z1wnuy0eBtQD8QKXH+h0hlfDHY8PMnQfygQil3q0uhjBAzfUa1gZEZbapL/xmZPRO+qx0hiSmW6Rt09BsTD9HzPY1XJbVpxJ4IzxrcCIKRi53REYG+hm/Z6+CcwKBgC4Y9FUgQFZwFCzGwQ/VIrvsaX2jmiU769JWmyFQTcRF0hI3nm1hAcOVpEZHwG9XifKx+1iNrQq8LJlX7/8bRO5RrQw7wPxhUXvi1BlwnxDZ5TjVFq0uF/yYihFFMR3t+bu7QqGyAYvmqLALrINy6e8Jca1M1no5PAvJ+f+VUNY0
+
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox
+spec:
+  selector:
+    matchLabels:
+      app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      volumes:
+      - name: volume-test
+        emptyDir: {}
+      containers:
+      - name: app
+        image: hub-mirror.c.163.com/library/busybox
+        volumeMounts:
+        - name: volume-test
+          mountPath: /datatest
+          readOnly: true
+        resources:
+          limits:
+            cpu: 100m
+            memory: 64M
+          requests:
+            cpu: 100m
+            memory: 64M
+        args:
+        - top
